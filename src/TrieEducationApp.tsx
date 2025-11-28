@@ -304,6 +304,8 @@ const CalloutCard = ({ icon: Icon, colorClass, title, children }: { icon: any, c
 
   const iconBg = colorClass === 'green' ? 'bg-green-900/30' : colorClass === 'amber' ? 'bg-amber-900/30' : 'bg-pink-900/30';
 
+  const iconBorder = colorClass === 'green' ? 'border-green-500/30' : colorClass === 'amber' ? 'border-amber-500/30' : 'border-pink-500/30';
+
 
 
   return (
@@ -322,7 +324,7 @@ const CalloutCard = ({ icon: Icon, colorClass, title, children }: { icon: any, c
 
       
 
-      <div className={`w-8 h-8 ${iconBg} ${textColor} flex items-center justify-center mb-3 border border-${colorClass}-500/30`}>
+      <div className={`w-8 h-8 ${iconBg} ${textColor} flex items-center justify-center mb-3 border ${iconBorder}`}>
 
         <Icon size={18} />
 
@@ -1144,38 +1146,61 @@ export default function TrieEducationApp() {
 
 
 
-            {/* Mock Body Content */}
-
+            {/* Search Results Summary */}
             <div className="bg-zinc-950 flex-1 p-4 overflow-y-auto relative">
+              {suggestions.length > 0 ? (
+                <>
+                  <h3 className="font-bold text-zinc-600 mb-4 text-xs uppercase tracking-widest border-b border-zinc-800 pb-1">
+                    Results_Summary
+                  </h3>
+                  <div className="space-y-2">
+                    <div className="bg-zinc-900 border border-zinc-800 p-3 text-xs font-mono">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-zinc-400">Total_Matches:</span>
+                        <span className="text-green-400 font-bold">{suggestions.length}</span>
+                      </div>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-zinc-400">Query_Length:</span>
+                        <span className="text-amber-400 font-bold">{searchTerm.length}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-zinc-400">Trie_Depth:</span>
+                        <span className="text-pink-400 font-bold">{trie.getPath(searchTerm).length}</span>
+                      </div>
+                    </div>
+                    <div className="bg-zinc-900 border border-zinc-800 p-3 text-xs">
+                      <div className="text-zinc-400 mb-2 uppercase tracking-widest">Top_Results:</div>
+                      <div className="space-y-1">
+                        {suggestions.slice(0, 3).map((item) => (
+                          <div key={item.id} className="flex items-center gap-2 text-zinc-500">
+                            <span className="text-green-500">{'>'}</span>
+                            <span className="truncate">{item.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : searchTerm ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center">
+                    <div className="text-red-500 text-xs font-mono uppercase mb-2">[NO_MATCHES]</div>
+                    <div className="text-zinc-600 text-[10px] font-mono">Query returned zero results</div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center">
+                    <div className="text-zinc-600 text-xs font-mono uppercase mb-2">[STANDBY]</div>
+                    <div className="text-zinc-700 text-[10px] font-mono">Enter search query to begin</div>
+                  </div>
+                </div>
+              )}
 
-               <h3 className="font-bold text-zinc-600 mb-4 text-xs uppercase tracking-widest border-b border-zinc-800 pb-1">Incoming_Stream</h3>
-
-               <div className="grid grid-cols-2 gap-3">
-
-                 {[1,2,3,4].map(i => (
-
-                   <div key={i} className="bg-zinc-900 border border-zinc-800 p-3 h-32 relative group hover:border-green-500/30 transition-colors">
-
-                     <div className="absolute top-2 right-2 w-1 h-1 bg-green-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-
-                     <div className="w-full h-full bg-zinc-800/50 animate-pulse"></div>
-
-                   </div>
-
-                 ))}
-
-               </div>
-
-               
-
-               {/* Faux HUD Elements */}
-
-               <div className="absolute bottom-2 right-2 text-[8px] text-zinc-700 font-mono">
-
-                  MEM: 48K | CPU: 12%
-
-               </div>
-
+              {/* Faux HUD Elements */}
+              <div className="absolute bottom-2 right-2 text-[8px] text-zinc-700 font-mono">
+                MEM: 48K | CPU: 12%
+              </div>
             </div>
 
             
