@@ -542,15 +542,16 @@ const TrieVisualizer = ({ trie, activePrefix }: { trie: Trie<Product>, activePre
 
 
 
-      <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+      {/* Legend and Buffer - Moved to top-right to avoid node overlap */}
+      <div className="absolute top-4 right-4 z-30 flex flex-col gap-2 max-w-[200px]">
 
-         <div className="bg-black/90 border border-green-500/30 p-2 text-xs text-green-500 font-mono shadow-[0_0_10px_rgba(34,197,94,0.2)]">
+         <div className="bg-black/95 border border-green-500/30 p-2 text-xs text-green-500 font-mono shadow-[0_0_10px_rgba(34,197,94,0.2)] backdrop-blur-sm">
 
           <div className="flex items-center gap-2 mb-1">
 
             <div className="w-2 h-2 bg-green-500 shadow-[0_0_8px_#22c55e]"></div>
 
-            <span className="tracking-widest">ACTIVE_SIGNAL</span>
+            <span className="tracking-widest text-[10px]">ACTIVE_SIGNAL</span>
 
           </div>
 
@@ -558,13 +559,13 @@ const TrieVisualizer = ({ trie, activePrefix }: { trie: Trie<Product>, activePre
 
             <div className="w-2 h-2 bg-zinc-600"></div>
 
-            <span className="tracking-widest">DORMANT_NODE</span>
+            <span className="tracking-widest text-[10px]">DORMANT_NODE</span>
 
           </div>
 
         </div>
 
-        <div className="bg-black/90 border border-zinc-700 px-3 py-1.5 text-xs font-mono text-zinc-400">
+        <div className="bg-black/95 border border-zinc-700 px-3 py-1.5 text-xs font-mono text-zinc-400 backdrop-blur-sm">
 
            BUFFER: <span className="text-green-400">"{activePrefix || 'NULL'}"</span>
 
@@ -574,7 +575,8 @@ const TrieVisualizer = ({ trie, activePrefix }: { trie: Trie<Product>, activePre
 
       
 
-      <svg className="w-full h-full relative z-10" viewBox={`0 -20 ${CANVAS_WIDTH} ${CANVAS_HEIGHT}`} preserveAspectRatio="xMidYMin meet">
+      {/* SVG with padding to avoid overlap with UI elements */}
+      <svg className="w-full h-full relative z-10" viewBox={`80 -20 ${CANVAS_WIDTH - 160} ${CANVAS_HEIGHT}`} preserveAspectRatio="xMidYMin meet">
 
         <defs>
 
@@ -596,135 +598,137 @@ const TrieVisualizer = ({ trie, activePrefix }: { trie: Trie<Product>, activePre
 
 
 
-        {/* Edges */}
+        {/* Edges - Render first so they appear behind nodes */}
+        <g className="edges">
+          {edges.map((edge, i) => {
 
-        {edges.map((edge, i) => {
+            const isActive = activePath.has(edge.source) && activePath.has(edge.target);
 
-          const isActive = activePath.has(edge.source) && activePath.has(edge.target);
+            return (
 
-          return (
+              <line
 
-            <line
+                key={`edge-${i}`}
 
-              key={`edge-${i}`}
+                x1={edge.x1} y1={edge.y1 + 15}
 
-              x1={edge.x1} y1={edge.y1 + 15}
+                x2={edge.x2} y2={edge.y2 - 15}
 
-              x2={edge.x2} y2={edge.y2 - 15}
-
-              stroke={isActive ? "#22c55e" : "#27272a"} 
-
-              strokeWidth={isActive ? 2 : 1}
-
-              className="transition-all duration-100"
-
-              style={{ filter: isActive ? "url(#glow-green)" : "none" }}
-
-            />
-
-          );
-
-        })}
-
-
-
-        {/* Nodes - Changed to Rects for "Chip" look */}
-
-        {nodes.map((node, i) => {
-
-          const isActive = activePath.has(node.data);
-
-          const isEnd = node.data.isEndOfWord;
-
-          const size = isEnd ? 28 : 24;
-
-          const offset = size / 2;
-
-          
-
-          return (
-
-            <g 
-
-              key={`node-${i}`} 
-
-              className="transition-all duration-300" 
-
-              transform={`translate(${node.x}, ${node.y})`}
-
-            >
-
-              {/* Connector trace */}
-
-              {isActive && <line x1={0} y1={-15} x2={0} y2={-offset} stroke="#22c55e" strokeWidth="2" />}
-
-              
-
-              {/* Chip Body */}
-
-              <rect
-
-                x={-offset}
-
-                y={-offset}
-
-                width={size}
-
-                height={size}
-
-                className={`transition-all duration-300 ${isActive ? 'fill-green-950 stroke-green-500' : 'fill-zinc-950 stroke-zinc-800'}`}
+                stroke={isActive ? "#22c55e" : "#27272a"} 
 
                 strokeWidth={isActive ? 2 : 1}
+
+                className="transition-all duration-100"
 
                 style={{ filter: isActive ? "url(#glow-green)" : "none" }}
 
               />
 
-              
+            );
 
-              {/* Text Label */}
+          })}
+        </g>
 
-              <text
 
-                dy=".3em"
 
-                textAnchor="middle"
+        {/* Nodes - Render second so they appear above edges */}
+        <g className="nodes">
+          {nodes.map((node, i) => {
 
-                className={`text-[10px] font-mono font-bold select-none ${isActive ? 'fill-green-400' : 'fill-zinc-600'}`}
+            const isActive = activePath.has(node.data);
+
+            const isEnd = node.data.isEndOfWord;
+
+            const size = isEnd ? 28 : 24;
+
+            const offset = size / 2;
+
+            
+
+            return (
+
+              <g 
+
+                key={`node-${i}`} 
+
+                className="transition-all duration-300" 
+
+                transform={`translate(${node.x}, ${node.y})`}
 
               >
 
-                {node.char.toUpperCase()}
+                {/* Connector trace */}
 
-              </text>
+                {isActive && <line x1={0} y1={-15} x2={0} y2={-offset} stroke="#22c55e" strokeWidth="2" />}
 
-              
+                
 
-              {/* Result Indicator - Tiny corner led */}
+                {/* Chip Body - Render first */}
 
-              {isEnd && (
+                <rect
 
-                <rect 
+                  x={-offset}
 
-                  x={offset - 6} 
+                  y={-offset}
 
-                  y={-offset + 2} 
+                  width={size}
 
-                  width={4} 
+                  height={size}
 
-                  height={4} 
+                  className={`transition-all duration-300 ${isActive ? 'fill-green-950 stroke-green-500' : 'fill-zinc-950 stroke-zinc-800'}`}
 
-                  className={isActive ? "fill-amber-500 animate-pulse" : "fill-zinc-800"} 
+                  strokeWidth={isActive ? 2 : 1}
+
+                  style={{ filter: isActive ? "url(#glow-green)" : "none" }}
 
                 />
 
-              )}
+                
 
-            </g>
+                {/* Result Indicator - Tiny corner led - Render before text */}
+                {isEnd && (
 
-          );
+                  <rect 
 
-        })}
+                    x={offset - 6} 
+
+                    y={-offset + 2} 
+
+                    width={4} 
+
+                    height={4} 
+
+                    className={isActive ? "fill-amber-500 animate-pulse" : "fill-zinc-800"} 
+
+                  />
+
+                )}
+
+                
+
+                {/* Text Label - Render last so it's always visible on top */}
+                <text
+
+                  dy=".3em"
+
+                  textAnchor="middle"
+
+                  className={`text-[10px] font-mono font-bold select-none pointer-events-none ${isActive ? 'fill-green-400' : 'fill-zinc-600'}`}
+
+                  style={{ paintOrder: 'stroke fill', stroke: isActive ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.5)', strokeWidth: '0.5px' }}
+
+                >
+
+                  {node.char.toUpperCase()}
+
+                </text>
+
+              </g>
+
+            );
+
+          })}
+        </g>
 
       </svg>
 
@@ -1044,9 +1048,9 @@ export default function TrieEducationApp() {
 
               {/* The Search Interaction */}
 
-              <div className="relative group">
+              <div className="relative group z-10">
 
-                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none z-10">
 
                   <span className="text-green-500 font-bold animate-pulse">{'>'}</span>
 
@@ -1056,7 +1060,7 @@ export default function TrieEducationApp() {
 
                   type="text"
 
-                  className="block w-full pl-8 pr-3 py-3 bg-black border-2 border-zinc-700 text-green-400 placeholder-zinc-700 focus:outline-none focus:border-green-500 focus:shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all font-mono uppercase tracking-wider"
+                  className="block w-full pl-8 pr-3 py-3 bg-black border-2 border-zinc-700 text-green-400 placeholder-zinc-700 focus:outline-none focus:border-green-500 focus:shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all font-mono uppercase tracking-wider relative z-10"
 
                   placeholder="QUERY_DATABASE..."
 
@@ -1078,7 +1082,7 @@ export default function TrieEducationApp() {
 
                 {/* Blinking cursor effect (visual only) */}
 
-                <div className="absolute right-3 top-4 text-[10px] font-mono text-zinc-600">
+                <div className="absolute right-3 top-4 text-[10px] font-mono text-zinc-600 z-20 pointer-events-none">
 
                    LEN:{searchTerm.length}
 
@@ -1086,58 +1090,33 @@ export default function TrieEducationApp() {
 
                 
 
-                {/* Autocomplete Dropdown */}
-
+                {/* Autocomplete Dropdown - Positioned below with proper spacing */}
                 {searchTerm && (
-
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-black border-2 border-green-500/50 shadow-2xl z-20">
-
-                    <div className="px-4 py-1.5 bg-green-900/20 border-b border-green-500/30 text-[10px] font-bold text-green-500 uppercase tracking-widest flex justify-between items-center">
-
-                      <span>Matches_Found</span>
-
-                      <span className="text-green-400 bg-green-900/40 px-1">
-
-                        {suggestions.length}
-
-                      </span>
-
-                    </div>
-
-                    
-
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-black border-2 border-green-500/50 shadow-2xl z-30 max-h-[300px] overflow-y-auto">
                     {suggestions.length > 0 ? (
-
-                      <ul className="max-h-60 overflow-y-auto custom-scrollbar">
-
-                        {suggestions.map((item) => (
-
-                          <SuggestionItem 
-
-                            key={item.id} 
-
-                            item={item} 
-
-                            matchLength={searchTerm.length} 
-
-                          />
-
-                        ))}
-
-                      </ul>
-
+                      <>
+                        <div className="px-4 py-1.5 bg-green-900/20 border-b border-green-500/30 text-[10px] font-bold text-green-500 uppercase tracking-widest flex justify-between items-center">
+                          <span>Matches_Found</span>
+                          <span className="text-green-400 bg-green-900/40 px-1">
+                            {suggestions.length}
+                          </span>
+                        </div>
+                        <ul className="max-h-60 overflow-y-auto custom-scrollbar">
+                          {suggestions.map((item) => (
+                            <SuggestionItem 
+                              key={item.id} 
+                              item={item} 
+                              matchLength={searchTerm.length} 
+                            />
+                          ))}
+                        </ul>
+                      </>
                     ) : (
-
-                      <div className="p-6 text-center text-red-500 text-xs font-mono uppercase border-t border-red-900/30">
-
+                      <div className="p-6 text-center text-red-500 text-xs font-mono uppercase">
                         [ERROR] No_Data_Found
-
                       </div>
-
                     )}
-
                   </div>
-
                 )}
 
               </div>
