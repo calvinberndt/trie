@@ -542,30 +542,30 @@ const TrieVisualizer = ({ trie, activePrefix }: { trie: Trie<Product>, activePre
 
 
 
-      {/* Legend and Buffer - Moved to top-right to avoid node overlap */}
-      <div className="absolute top-4 right-4 z-30 flex flex-col gap-2 max-w-[200px]">
+      {/* Legend and Buffer - Compact design in top-right corner */}
+      <div className="absolute top-2 right-2 z-30 flex flex-col gap-1.5 max-w-[180px]">
 
-         <div className="bg-black/95 border border-green-500/30 p-2 text-xs text-green-500 font-mono shadow-[0_0_10px_rgba(34,197,94,0.2)] backdrop-blur-sm">
+         <div className="bg-black/95 border border-green-500/30 p-1.5 text-[10px] text-green-500 font-mono shadow-[0_0_10px_rgba(34,197,94,0.2)] backdrop-blur-sm">
 
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-1.5 mb-0.5">
 
-            <div className="w-2 h-2 bg-green-500 shadow-[0_0_8px_#22c55e]"></div>
+            <div className="w-1.5 h-1.5 bg-green-500 shadow-[0_0_6px_#22c55e] flex-shrink-0"></div>
 
-            <span className="tracking-widest text-[10px]">ACTIVE_SIGNAL</span>
+            <span className="tracking-widest text-[9px]">ACTIVE_SIGNAL</span>
 
           </div>
 
-          <div className="flex items-center gap-2 opacity-50">
+          <div className="flex items-center gap-1.5 opacity-50">
 
-            <div className="w-2 h-2 bg-zinc-600"></div>
+            <div className="w-1.5 h-1.5 bg-zinc-600 flex-shrink-0"></div>
 
-            <span className="tracking-widest text-[10px]">DORMANT_NODE</span>
+            <span className="tracking-widest text-[9px]">DORMANT_NODE</span>
 
           </div>
 
         </div>
 
-        <div className="bg-black/95 border border-zinc-700 px-3 py-1.5 text-xs font-mono text-zinc-400 backdrop-blur-sm">
+        <div className="bg-black/95 border border-zinc-700 px-2 py-1 text-[10px] font-mono text-zinc-400 backdrop-blur-sm">
 
            BUFFER: <span className="text-green-400">"{activePrefix || 'NULL'}"</span>
 
@@ -575,8 +575,8 @@ const TrieVisualizer = ({ trie, activePrefix }: { trie: Trie<Product>, activePre
 
       
 
-      {/* SVG with padding to avoid overlap with UI elements */}
-      <svg className="w-full h-full relative z-10" viewBox={`80 -20 ${CANVAS_WIDTH - 160} ${CANVAS_HEIGHT}`} preserveAspectRatio="xMidYMin meet">
+      {/* SVG - Full viewBox to show all nodes */}
+      <svg className="w-full h-full relative z-10" viewBox={`0 -20 ${CANVAS_WIDTH} ${CANVAS_HEIGHT}`} preserveAspectRatio="xMidYMin meet">
 
         <defs>
 
@@ -1088,98 +1088,68 @@ export default function TrieEducationApp() {
 
                 </div>
 
-                
-
-                {/* Autocomplete Dropdown - Positioned below with proper spacing */}
-                {searchTerm && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-black border-2 border-green-500/50 shadow-2xl z-30 max-h-[300px] overflow-y-auto">
-                    {suggestions.length > 0 ? (
-                      <>
-                        <div className="px-4 py-1.5 bg-green-900/20 border-b border-green-500/30 text-[10px] font-bold text-green-500 uppercase tracking-widest flex justify-between items-center">
-                          <span>Matches_Found</span>
-                          <span className="text-green-400 bg-green-900/40 px-1">
-                            {suggestions.length}
-                          </span>
-                        </div>
-                        <ul className="max-h-60 overflow-y-auto custom-scrollbar">
-                          {suggestions.map((item) => (
-                            <SuggestionItem 
-                              key={item.id} 
-                              item={item} 
-                              matchLength={searchTerm.length} 
-                            />
-                          ))}
-                        </ul>
-                      </>
-                    ) : (
-                      <div className="p-6 text-center text-red-500 text-xs font-mono uppercase">
-                        [ERROR] No_Data_Found
-                      </div>
-                    )}
-                  </div>
-                )}
-
               </div>
 
             </div>
 
 
 
-            {/* Search Results Summary */}
-            <div className="bg-zinc-950 flex-1 p-4 overflow-y-auto relative">
-              {suggestions.length > 0 ? (
+            {/* Search Results - Moved here from dropdown */}
+            <div className="bg-zinc-950 flex-1 flex flex-col overflow-hidden relative">
+              {searchTerm ? (
                 <>
-                  <h3 className="font-bold text-zinc-600 mb-4 text-xs uppercase tracking-widest border-b border-zinc-800 pb-1">
-                    Results_Summary
-                  </h3>
-                  <div className="space-y-2">
-                    <div className="bg-zinc-900 border border-zinc-800 p-3 text-xs font-mono">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-zinc-400">Total_Matches:</span>
-                        <span className="text-green-400 font-bold">{suggestions.length}</span>
-                      </div>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-zinc-400">Query_Length:</span>
-                        <span className="text-amber-400 font-bold">{searchTerm.length}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-zinc-400">Trie_Depth:</span>
-                        <span className="text-pink-400 font-bold">{trie.getPath(searchTerm).length}</span>
+                  {/* Results Header */}
+                  <div className="px-4 py-2 bg-zinc-900 border-b border-zinc-800 flex justify-between items-center">
+                    <h3 className="font-bold text-green-500 text-xs uppercase tracking-widest">
+                      Matches_Found
+                    </h3>
+                    <span className="text-green-400 bg-green-900/40 px-2 py-0.5 text-[10px] font-bold border border-green-500/30">
+                      {suggestions.length}
+                    </span>
+                  </div>
+
+                  {/* Results List */}
+                  {suggestions.length > 0 ? (
+                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                      <ul>
+                        {suggestions.map((item) => (
+                          <SuggestionItem 
+                            key={item.id} 
+                            item={item} 
+                            matchLength={searchTerm.length} 
+                          />
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-red-500 text-xs font-mono uppercase mb-2">[ERROR] No_Data_Found</div>
+                        <div className="text-zinc-600 text-[10px] font-mono">Query returned zero results</div>
                       </div>
                     </div>
-                    <div className="bg-zinc-900 border border-zinc-800 p-3 text-xs">
-                      <div className="text-zinc-400 mb-2 uppercase tracking-widest">Top_Results:</div>
-                      <div className="space-y-1">
-                        {suggestions.slice(0, 3).map((item) => (
-                          <div key={item.id} className="flex items-center gap-2 text-zinc-500">
-                            <span className="text-green-500">{'>'}</span>
-                            <span className="truncate">{item.name}</span>
-                          </div>
-                        ))}
-                      </div>
+                  )}
+
+                  {/* Results Summary Footer */}
+                  <div className="px-4 py-2 bg-zinc-900 border-t border-zinc-800 space-y-1.5">
+                    <div className="flex justify-between items-center text-[10px] font-mono">
+                      <span className="text-zinc-400">Query_Length:</span>
+                      <span className="text-amber-400 font-bold">{searchTerm.length}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] font-mono">
+                      <span className="text-zinc-400">Trie_Depth:</span>
+                      <span className="text-pink-400 font-bold">{trie.getPath(searchTerm).length}</span>
                     </div>
                   </div>
                 </>
-              ) : searchTerm ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-center">
-                    <div className="text-red-500 text-xs font-mono uppercase mb-2">[NO_MATCHES]</div>
-                    <div className="text-zinc-600 text-[10px] font-mono">Query returned zero results</div>
-                  </div>
-                </div>
               ) : (
-                <div className="flex items-center justify-center h-full">
+                <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-zinc-600 text-xs font-mono uppercase mb-2">[STANDBY]</div>
                     <div className="text-zinc-700 text-[10px] font-mono">Enter search query to begin</div>
                   </div>
                 </div>
               )}
-
-              {/* Faux HUD Elements */}
-              <div className="absolute bottom-2 right-2 text-[8px] text-zinc-700 font-mono">
-                MEM: 48K | CPU: 12%
-              </div>
             </div>
 
             
