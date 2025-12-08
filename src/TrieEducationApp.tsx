@@ -6,8 +6,6 @@ import {
 
   ShoppingCart, 
 
-  Tag, 
-
   Zap, 
 
   Info, 
